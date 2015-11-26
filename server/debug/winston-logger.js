@@ -28,6 +28,11 @@ require('string');
 
 		var logLvl = getLogLevelNum(config.consoleLogLevel);
 
+		/**
+		 * Grab current set log level number from a given log level string
+		 * @param  {String} logLevel [description]
+		 * @return {Number} Number corresponding to current log level
+		 */
 		function getLogLevelNum(logLevel){
 			switch(logLevel || config.consoleLogLevel){
 				case 'silly': return 1;
@@ -39,15 +44,6 @@ require('string');
 				default: return 4;
 			}
 		}
-
-
-		//TODO FIX THIS::: DANGEROUS RACE CONDITION
-		//Make a log directory if one didn't exist already
-		fs.mkdir(path.join(__projrootdir, 'logs'), function mkLogsDir(err){
-				return (err)
-						? err
-						: 'log directory created';
-		});
 
 		//TODO this is not DRY - the filenames are declared twice
 		var logFileNames = ['excessive-data-log.log', 'all-logs.log', 'console-log-record.log'];
@@ -78,17 +74,18 @@ require('string');
 								hr = (date.getHours() > 9) ? date.getHours() : '0' + date.getHours(),
 								min = (date.getMinutes() > 9) ? date.getMinutes() : '0' + date.getMinutes(),
 								sec = (date.getSeconds() > 9) ? date.getSeconds() : '0' + date.getSeconds();
-
 						return ('|' + mon + '/' + dtOfMon + '-' + hr + ':' + min + ':' + sec + '|').gray.bold;
 				};
 
 				//Builds transports into specific files
 				var fileTransportFactory = function fileTransportFactory(logLvl, logNm, logFilePath, opts) {
 						opts = opts || {};
+					// if (getLogLevelNum(config.consoleLogLevel) >= getLogLevelNum(logLvl)) {
+
 						return new (winston.transports.File)({
 								label: (loggerTypeLabel || ''),
 								name: logNm,
-								level: logLvl,
+								level: config.consoleLogLevel || 'info',
 								filename: path.join(__projrootdir, 'logs', logFilePath),
 								handleExceptions: true,
 								json: opts.jsonOut || false,
@@ -114,22 +111,16 @@ require('string');
 
 								//COMPLETE (EXCESSIVE) DATA --> FILE LOG
 								fileTransportFactory('silly', 'silly-log', 'lvl1-excessive-data-log.log'),
-
 								//COMPLETE (EXCESSIVE) DATA --> FILE LOG
 								fileTransportFactory('verbose', 'verbose-log', 'lvl2-verbose-log.log'),
-
 								//COMPLETE (EXCESSIVE) DATA --> FILE LOG
 								fileTransportFactory('debug', 'debug-log', 'lvl3-debug-log.log'),
-
 								//INFO --> FILE LOG
 								fileTransportFactory('info', 'info-log', 'lvl4-info-log.log'),
-
 								//WARN --> FILE LOG
 								fileTransportFactory('warn', 'warn-log', 'lvl5-warn-log.log'),
-
 								//WARN --> FILE LOG
 								fileTransportFactory('error', 'error-log', 'lvl6-error-log.log'),
-
 								//CONSOLE --> FILE LOG
 								fileTransportFactory(consoleLogLevel, 'console-log', 'console-log-record.log')
 						],
@@ -154,28 +145,33 @@ require('string');
 		//*********************************//
 		/**
 		 * Logging functions specificlaly for output to the CLI
+		 * Call with: logger.cli.dir, logger.cli.block, logger.cli.title,
+		 * logger.cli.heading, logger.cli.error, logger.cli.getType, logger.cli.getMsgOut
 		 */
-		var cli = module.exports.cli = (function(){
-
+		var cli = (function(){
 
 			//See below - made public as cli.block - or just [logObject].block
 			var _logBlock = function _logBlock(filename, logLevel, title, data, opts) {
-				var chk50 = _.repeat('!', 50);
+				var ck50 = _.repeat('!', 50);
 
 				// check for inclusion of a log level - if none given, assume var logLevel contains title
 				if (!_.includes(logLevelsArr, logLevel)){
-					if (data) opts = data;
-					if (title) data = title;
+					if (data) {
+						opts = data;
+					}
+					if (title) {
+						data = title;
+					}
 					title = logLevel;
 					logLevel = 'info';
 				}
 
 				//Don't display if logLevel is too low
-				if (logLvl > getLogLevelNum(logLevel)) return;
-
-				console.log('*** ' + filename + ' ***');
-				console.log('\n\n');
-				console.log(chk50 + ' ' + _.trim(title) + ' ' + chk50);
+				if (logLvl > getLogLevelNum(logLevel)) {
+					return;
+				}
+				//Output a big topbar
+				console.log('*** ' + filename + ' ***' + '\n\n' + ck50 + ' ' + _.trim(title) + ' ' + ck50);
 				if (opts && opts.doDir) {
 						this.dir(data);
 				} else {
@@ -186,7 +182,7 @@ require('string');
 						: console.log(_.repeat('!', 140) + '\n\n');
 			};
 
-			//
+			//@EXPORT
 			return {
 				/**
 				 * Fill-in for console.dir, with better default options (and use of output cleaners)
@@ -198,14 +194,21 @@ require('string');
 				dir: function dir(filename, logLevel, obj, depth){
 					console.log('in dir?');
 					if (_.isObject(logLevel)) {
-						if (_.isNumber(obj)) depth = obj;
+						//Handling if logLevel is a number - i.e. representing level of log
+						if (_.isNumber(obj)) {
+							depth = obj;
+						}
 						obj = logLevel;
 						logLevel = 'info';
 					}
 					console.log(getLogLevelNum(logLevel));
 					console.log(logLvl);
-					if (getLogLevelNum(logLevel) < logLvl) return;
+					//Do nothing if the log level is too low
+					if (getLogLevelNum(logLevel) < logLvl) {
+						return;
+					}
 
+					//Output large header with name of containing file
 					console.log('*** ' + filename + ' ***');
 					return (depth)
 						? console.dir(obj, { depth: depth, colors: true })
@@ -228,16 +231,12 @@ require('string');
 				 * Emits a large, highly visible heading
 				 * @param	{String} str		 string to output to	console
 				 * @param	{String} lpadStr Character to use for padding; none used by default
-				 * @return {Function} Log-emitting function - which runs immediately on return.
 				 */
 				heading: function heading(filename, str){
-					var chk50 = _.repeat('#', 50);
-					console.log('\n\n');
-					console.log(_.repeat('-', filename.length + 4));
+					var ck50 = _.repeat('#', 50);
+					console.log('\n\n' + _.repeat('-', filename.length + 4));
 					console.log('| ' + filename + ' |');
-					console.log(chk50 + ' ' +
-						str.toUpperCase().underline.bgYellow.black +
-						' ' + chk50 + '\n');
+					console.log(ck50 + ' ' + str.toUpperCase().underline.bgYellow.black + ' ' + ck50 + '\n');
 				},
 
 				/**
@@ -300,9 +299,12 @@ require('string');
 				},
 
 				/**
+				 * TODO figure out what to do with this bastard
+				 *
 				 * Logging function designed to output a Seneca object to the CLI. If msg isn't a Seneca
 				 * obj, it'll log the obj anyway, minus the special processing.
 				 * @param	{Object} msg - Seneca object to have contents displayed on the CLI
+				 *
 				 * @return {Function}		 function that does actual logging - to run immediately on return
 				 */
 				senecaMsgOut: function senecaMsgOut(filename, msg) {
@@ -349,31 +351,46 @@ require('string');
 		//--------------------------------------------------------------------//
 /**************************************************************************************************/
 
-	/**
-	 * @export
-	 * @param  {String} filename - name of file logging the data
-	 * @return {Object} Log object - containing a set of logging functions
-	 */
-	module.exports = function(filename){
-		var logObj = logger(filename, '', config.consoleLogLevel);
-		logObj.transports.console.level = config.consoleLogLevel || 'info';
+	// /**
+	//  * @export
+	//  * @param  {String} filename - name of file logging the data
+	//  * @return {Object} Log object - containing a set of logging functions
+	//  */
+	// module.exports = function bindLogs(filename){
+	// 	var logObj = logger(filename, '', config.consoleLogLevel);
+	// 	logObj.transports.console.level = config.consoleLogLevel || 'info';
+	// 	// logObj('info', '\n\n\n\n\n\n\n\nTEST - GOT IT!\n\n\n\n\n\n\n\n')
 
-		// bind 'cli' object to log; return fully built log module
-		return _.reduce(cli, function(fnObj, fn, fnNm){
-			logObj[fnNm] = fn.bind(this, filename || '');
-			return logObj;
-		}, logObj);
+	// 	// bind 'cli' object to log; return fully built log module
+	// 	return _.reduce(cli, function(fnObj, fn, fnNm){
+	// 		logObj[fnNm] = fn.bind(this, filename || '');
+	// 		return logObj;
+	// 	}, logObj);
+	// };
+
+	module.exports = {
+		log: logger,
+		dir: cli.dir,
+		title: cli.title,
+		heading: cli.heading,
+		block: cli.block,
+		getType: cli.getType
 	};
 
-		//API:
-		//  log('name_of_file.js')
-		//	log.info
-		//	log.log('info', msg)
-		//	log.dir
-		//	log.block
-		//	log.error
-		//	log.getType
-		//	log.cli.title
-		//
-		//
 }());
+
+
+/***
+*		Create File Logger
+*
+*		Function will return a logger object contextified with a given prefix to use in all file logs.
+*
+*		@param prefix {String} The prefix to use in all file logs.
+*/
+function createFileLogger () {
+	return function (fileName) {
+		var logger = prefixedLogger('[' + fileName + ']');
+		logger.fn = createFunctionLogger('[' + fileName + ']');
+		return logger;
+	};
+}

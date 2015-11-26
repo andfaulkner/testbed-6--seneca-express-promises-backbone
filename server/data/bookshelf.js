@@ -1,11 +1,17 @@
+var logger = require('server/debug/winston-logger');
+var log = logger.log('bookshelf.js');
+
+log.info('in bookshelf!')
+
 var knex = require('knex')({
   client: 'pg',
   connection: {
-    host     : '127.0.0.1',
+    host     : 'localhost',
     user     : 'postgres',
-    password : '123456',
+    password : 'postgres',
     database : 'postgres',
-    charset  : 'utf8'
+    charset  : 'utf8',
+    port: 5432
   }
 });
 

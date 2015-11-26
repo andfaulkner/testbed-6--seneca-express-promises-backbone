@@ -36,7 +36,7 @@ if (process.env.NODE_ENV !== 'production') {
     require('clarify'); // Exclude node internal calls from the stack
 }
 
-var log = require('server/debug/winston-logger')('server.js');
+var log = require('server/debug/winston-logger').log('server.js');
 require('server/debug/uncaught-error-handler');
 //********************************************************************//
 
@@ -46,8 +46,8 @@ log.info(path.join(__dirname, '.build'));
 //******************************* SENECA *******************************//
 var seneca = require('server/microservices/launch-seneca.js')
     .ready(function(err){
-        log.dir(seneca);
-        console.log(seneca.start_time);
+        // log.dir(seneca);
+        log.info(seneca.start_time);
     });
 //**********************************************************************//
 

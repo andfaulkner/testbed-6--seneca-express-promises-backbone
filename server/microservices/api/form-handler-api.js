@@ -1,4 +1,4 @@
-var log = require('server/debug/winston-logger')('server/microservices/api/form-handler-api');
+var log = require('server/debug/winston-logger').log('server/microservices/api/form-handler-api');
 var bookshelf = require('../../data/bookshelf.js');
 
 var StarterDataModel = bookshelf.Model.extend({
@@ -38,7 +38,6 @@ module.exports = function formHandlerAPI_SenecaPlugin(options) {
      * Handles data submitted by the 'bear form' on the main page
      * @param  {Object}   msg      Seneca args. access msg via msg.req$.body.
      * @param  {Function} callback Send successful result to callback
-     * @return {[type]}            [description]
      */
     function save_form_data_cb(msg, callback){
     	var roles = _.map(msg.req$.body.roles.split(','), _.trim);
@@ -65,8 +64,8 @@ module.exports = function formHandlerAPI_SenecaPlugin(options) {
 	      	rar: msg.req$.body.rar,
 
 	      }).save().then(function(model){
-	      	console.log('model saved!');
-	      	console.dir(model);
+	      	log.debug('model saved - save_form_data_cb');
+	      	log.debug(' - save_form_data_cb - model: ' + model);
 	        callback(null, { some_key: 'some_result'});
 	      });
     	});
@@ -74,9 +73,8 @@ module.exports = function formHandlerAPI_SenecaPlugin(options) {
 
     /**
      * Send back ALL the data.
-     * @param  {[type]}   msg      [description]
-     * @param  {Function} callback [description]
-     * @return {[type]}            [description]
+     * @param  {Object}   msg      Seneca args object
+     * @param  {Function} callback Seneca callback - returns bear data collection from action
      */
     function return_bear_display_collection_cb(msg, callback){
 			new StarterDataModel().fetchAll()

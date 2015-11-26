@@ -1,7 +1,9 @@
+var logger = require('server/debug/winston-logger');
+var log = logger.log('server/debug/uncaught-error-handler');
+
 module.exports = function test_API_microservice_module(options) {
     var seneca = this;
     var plugin = 'api';
-
 
     this.add({ role: plugin, cmd: 'withdraw' }, roleAPICmdWithdraw_action);
     this.add({ role: plugin, cmd: 'offer' }, roleAPICmdOffer_action);
@@ -18,7 +20,6 @@ module.exports = function test_API_microservice_module(options) {
         }}
     );
 
-
     function roleAPICmdOffer_action(msg, callback) {
         var jsonResponsePayload = {
             // msgReceived: msg,
@@ -30,7 +31,8 @@ module.exports = function test_API_microservice_module(options) {
     }
 
     function roleAPICmdWithdraw_action(msg, callback) {
-        console.dir(msg);
+        log.debug('roleAPICmdWithdraw_action:\n');
+        log.debug(msg);
         var jsonResponsePayload = {
             // msgReceived: msg,
             // fn: 'roleAPICmdWithdraw_action',

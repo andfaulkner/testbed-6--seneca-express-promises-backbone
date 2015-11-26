@@ -26,9 +26,6 @@ module.exports = function api(options) {
         { role: 'api', path:'calculate' },
         function(msg, respond) {
             log.info('~~~~~~~~~~~~ role:api,path:calculate ~~~~~~~~~~~~');
-            // log.info(msg.operation);
-            // log.info(valid_ops[msg.operation]);
-            // log.info(msg);
             this.act(
                 { role: 'math' },
                 { cmd:    valid_ops[msg.operation],

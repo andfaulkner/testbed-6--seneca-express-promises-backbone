@@ -1,4 +1,5 @@
-var log = require('server/debug/winston-logger')('server/debug/uncaught-error-handler');
+var logger = require('server/debug/winston-logger');
+var log = logger.log('server/debug/uncaught-error-handler');
 var _ = require('lodash');
 require('colors');
 require('string').extendPrototype();
@@ -21,7 +22,7 @@ module.exports = (function uncaughtErrorHandler(){
         console.log('((FULL STACKTRACE ABOVE))'.red.bgBlack + '\n');
 
         console.log('ERROR:'.red.bold.bgBlack);
-        log.dir('error', err);
+        logger.dir('error', err);
 
         var splitStack = (err.stack).split('\n    ');
 
@@ -30,7 +31,7 @@ module.exports = (function uncaughtErrorHandler(){
         }).join('\n');
 
         if (mainArg.length > 0) {
-            log.cli.title(mainArg, '   ');
+            logger.title(mainArg, '   ');
         }
 
         console.log('_'.times(100) + '\n' + '_'.times(100));

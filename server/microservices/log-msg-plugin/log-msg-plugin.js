@@ -1,4 +1,5 @@
-var log = require('server/debug/winston-logger')('server/microservices/log-msg-plugin/log-msg-plugin');
+var logger = require('server/debug/winston-logger');
+var log = logger.log('server/microservices/log-msg-plugin/log-msg-plugin');
 
 module.exports = function log_msg(options) {
 
@@ -77,10 +78,10 @@ module.exports = function log_msg(options) {
      * Runs prior to any fn triggered by calls starting w/ role:'log_msg'; actual call triggered by
      * this.prior below. E.g. for a call to {role:'log_msg', cmd:'block'}, the run order would be:
      *     [this.wrap -> this.prior ==]==> this.add({role:'log_msg', cmd:'block'}) callback
-     * @param  {[type]} msg        [description]
-     * @param  {[type]} respond)
+     * @param  {Object} msg - seneca args
+     * @param  {Function} respond - callback - to be run by 'super' (this.prior)
      */
-    this.wrap({role:'log_msg'}, function(msg, respond){
+    this.wrap({role:'log_msg'}, function(msg, respond) {
         log.silly('in log-msg-plugin wrapper function');
         this.prior(msg, respond);
     });

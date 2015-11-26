@@ -15,7 +15,7 @@ module.exports = {
 
     winstonLogs: {
         exitOnError: false,
-        consoleLogLevel: 'info',
+        consoleLogLevel: process.env.LOG_LEVEL || 'info',
         senecaLogLevel: 'warn',
     },
 
