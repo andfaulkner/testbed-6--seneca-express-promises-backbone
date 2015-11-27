@@ -65,7 +65,8 @@ async.each(senPluginsList,
         }
         log.info('all Seneca plugins successfully requested!');
         var bluebirdTests = require('server/practice-promises/bluebird-test');
-        bluebirdTests.runTests();
+        // bluebirdTests.runTests();
+        bluebirdTests.treasureHunt()
         return;
     }
 );

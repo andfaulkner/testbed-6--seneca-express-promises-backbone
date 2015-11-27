@@ -1,0 +1,30 @@
+{
+	"orderFile": "file_pile/order.json",
+	"files": [
+		{
+			"name": "_LET_ONE.txt",
+			"number": 1
+		}, {
+			"name": "_LET_TWO.txt",
+			"number": 2
+		}, {
+			"name": "_LET_THREE.txt",
+			"number": 3
+		}, {
+			"name": "_LET_FOUR.txt",
+			"number": 4
+		}, {
+			"name": "_LET_FIVE.txt",
+			"number": 5
+		}, {
+			"name": "_LET_SIX.txt",
+			"number": 6
+		}, {
+			"name": "_LET_SEVEN.txt",
+			"number": 7
+		}, {
+			"name": "_LET_EIGHT.txt",
+			"number": 8
+		}
+	]
+}
