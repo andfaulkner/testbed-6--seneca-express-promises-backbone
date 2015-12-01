@@ -11,13 +11,13 @@ var BackboneAppView = Backbone.View.extend({
 	},
 
 	loadHTMLSnippetFileIntoEl: function loadHTMLSnippetFileIntoEl(route, noRender, cb) {
-		var that = this;
+		var self = this;
 		this.getComponent(route).then(function(htmlSnippet) {
-			if (that.noRender) {
+			if (self.noRender) {
 				return (cb) ? cb(htmlSnippet) : htmlSnippet;
 			}
-			that.$el.empty();
-			that.$el.html(htmlSnippet);
+			self.$el.empty();
+			self.$el.html(htmlSnippet);
 			return (cb) ? cb(htmlSnippet) : htmlSnippet;
 		});
 	},

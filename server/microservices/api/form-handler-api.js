@@ -55,7 +55,10 @@ module.exports = function formHandlerAPI_SenecaPlugin(options) {
 					return;
 				});
 
-    	}).then(function(){
+    	}).catch(function(error){
+    		callback(error, error);
+    	})
+    	.then(function(){
 	      new StarterDataModel({
 	      	first_name: msg.req$.body.name.first,
 	      	last_name: msg.req$.body.name.last,
@@ -63,7 +66,12 @@ module.exports = function formHandlerAPI_SenecaPlugin(options) {
 	      	favorite_bear: msg.req$.body.favorite_bear,
 	      	rar: msg.req$.body.rar,
 
-	      }).save().then(function(model){
+	      })
+	      .save().catch(function(error){
+  	  		callback(error, error);
+	    	})
+
+	      .then(function(model){
 	      	log.debug('model saved - save_form_data_cb');
 	      	log.debug(' - save_form_data_cb - model: ' + model);
 	        callback(null, { some_key: 'some_result'});
@@ -78,6 +86,9 @@ module.exports = function formHandlerAPI_SenecaPlugin(options) {
      */
     function return_bear_display_collection_cb(msg, callback){
 			new StarterDataModel().fetchAll()
+				.catch(function(error){
+					callback(error, error);
+				})
 				.then(function(data){
 					var finalDataObj = _.reduce(data.models, function(outputData, collItem){
 						outputData.push({

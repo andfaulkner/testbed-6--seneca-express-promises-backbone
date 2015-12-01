@@ -102,11 +102,13 @@ module.exports.treasureHunt = function treasureHunt() {
 
 		.then(function loadFilesFromArr(json){
 			var textFiles = _.get(json, 'files');
+
 			return _.reduce(textFiles, function buildTextLoaderArr(loadFilePromises, fileData) {
 				var filePath = path.join(__dirname, 'files/file_pile', fileData.name);
 				loadFilePromises.push(readUtf8FileAsync(filePath));
 				return loadFilePromises;
 			}, []);
+
 		})
 
 		.all().then(function(textFiles){

@@ -13,11 +13,6 @@ module.exports = function BaseContentViewFactory(options) {
     	render: function render() {
 				console.log('%c\n\nBCVF::BASE-CONTENT-VIEW-FACTORY::: ENTERED RENDER\n\n',"color:green");
 				this.loadHTMLSnippetFileIntoEl(options.route);
-				// this.getComponent(options.route).then(function(data) {
-				// 	console.log('%c\n\nBCVF::BASE-CONTENT-VIEW-FACTORY::: RENDER:: ' +
-				// 		'getComponent cb\n\n',"color:green");
-    // 			this.$el.html(data);
-				// }.bind(this));
 			}
   	}))({ el: options.el });
   };

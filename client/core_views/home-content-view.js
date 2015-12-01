@@ -1,24 +1,40 @@
 var BackboneAppView = require('./backbone-view.js');
-var URLs = require('../urls.js');
 
 module.exports = BackboneAppView.extend({
   	events: {
   		'click #forms_page--form__submitBtn': 'submitForm'
   	},
-  	render: function render() {
-  		var that = this;
-  		this.loadHTMLSnippetFileIntoEl('components/forms_page/forms.html');
+  	render: function render(isRerender) {
+  		var self = this;
+  		self.loadHTMLSnippetFileIntoEl('components/forms_page/forms.html', false,
+  			function htmlLoaded(){
+					if (isRerender) self.trigger('renderComplete', true);
+  		});
 		},
+		// data & xhr comes from model
+		displaySuccessfulSubmit: function successfulSubmit(data, xhr){
+			console.log('view says submit successful!');
+			this.render(true);
+		},
+		/**
+		 * If model submit fails, do this.
+		 */
+		displaySubmitError: function successfulSubmit(error){
+			console.log('Submit failed! Try again...says the view');
+		},
+		/**
+		 * Listen to associated model for successful or failed data submit; then render view
+		 */
+		initialize: function initialize(){
+			var self = this;
+			self.listenTo(self.model, 'sync', self.displaySuccessfulSubmit);
+			self.listenTo(self.model, 'error', self.displaySubmitError);
+			this.render();
+		},
+		//Acts as "save" action
 		//Submit button; TODO also send this to the model?
 		submitForm: function submitForm(event){
 			event.preventDefault();
-      $.ajax({
-      		url: URLs.indexBearDataReceiver,
-      		type: 'post',
-      		data: $("#forms_page--form-target").serialize(),
-      		success: function(data, textStatus, xhr) {
-	          console.log('form submission complete!');
-	        }
-      });
+			this.model.save($("#forms_page--form-target").serialize());
 		}
   });

@@ -8,6 +8,7 @@ Backbone.sync = backboneSync;
 
 //CLASS//
 var BearDisplayDataCollection = Backbone.Collection.extend({
+	//Components of bear display data collection
 	model: BearDisplayData,
 	url: '/api/return_bear_display_collection',
 	events: {
@@ -16,9 +17,11 @@ var BearDisplayDataCollection = Backbone.Collection.extend({
 	handleNewData: function handleNewData(){
 		console.log('handleNewData');
 	},
+	//Run on load of display page - allows for e.g. population of grid
 	grabData: function grabData(){
 		this.fetch();
 	},
+	//Set up collection of bear data
 	initialize: function initialize(){
 		console.log('initializing BearDisplayDataCollection!')
 	}
